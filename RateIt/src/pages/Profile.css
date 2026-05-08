@@ -1,0 +1,136 @@
+.profilePage {
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding: 16px;
+    text-align: left;
+    font-family: Inter, sans-serif;
+}
+
+/* Titles */
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+.reviewTitle {
+    color: #000;
+}
+
+/* Profile card */
+.profileCard {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+/* top */
+.profileTop {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #ddd;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000;
+}
+
+/* stats */
+.statsRow {
+    display: flex;
+    gap: 10px;
+}
+
+.statBox {
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 0px 4px;
+    text-align: center;
+    min-width: 55px;
+}
+
+.statNumber {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.statLabel {
+    font-size: 13px;
+    color: #666;
+    margin-top: -6px;
+}
+
+/* joined */
+.joined {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: -10px;
+    text-align: right;
+}
+
+/* reviews */
+.reviewCard {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.reviewTop {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.rating {
+    color: #000;
+    font-size: 14px;
+}
+
+.reviewBottom {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+}
+
+.profileBottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 16px;
+}
+
+.star {
+    color: #f5b301;
+    font-size: 18px;
+}
+
+.backButton {
+    font-size: 32px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.backButton:hover {
+    color: #000;
+}

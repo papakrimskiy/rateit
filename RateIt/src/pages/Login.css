@@ -1,0 +1,92 @@
+.page {
+    height: 100vh;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    font-family: Inter, sans-serif;
+}
+
+.container {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 20px;
+    letter-spacing: -0.2px;
+    font-weight: 700;
+}
+
+.inputWrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.inputWrapper input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+}
+
+.icon {
+    margin-right: 8px;
+    color: #aaa;
+}
+
+.primaryButton {
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.primaryButton:hover {
+    opacity: 0.85;
+}
+
+.or {
+    font-size: 12px;
+    color: #888;
+    margin: 4px 0;
+}
+
+.googleButton {
+    width: 90%;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.googleButton:hover {
+    background: #f9f9f9;
+}
+
+.footer {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    font-size: 12px;
+    color: #4a90e2;
+}

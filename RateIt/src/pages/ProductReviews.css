@@ -1,0 +1,266 @@
+.productPage {
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding: 16px;
+}
+
+/* TOP */
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.backBtn,
+.sortBtn {
+    font-size: 32px;
+    cursor: pointer;
+}
+
+/* CARDS */
+.productCard,
+.reviewCard {
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    margin-top: 12px;
+}
+
+/* PRODUCT */
+.productTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.productName {
+    font-weight: 600;
+    color: #000;
+    max-width: 70%;
+}
+
+/* RIGHT SIDE */
+.rightBlock,
+.rightMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.trend {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.trend.up {
+    color: green;
+}
+
+.trend.down {
+    color: red;
+}
+
+/* RATING */
+.ratingBlock {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.star {
+    color: #f5b301;
+    font-size: 20px;
+}
+
+/* FIX 1: rating black */
+.ratingValueBlack {
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* REVIEW HEADER (FIX 2 layout) */
+.reviewHeader {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    gap: 10px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ddd;
+}
+
+.metaBlock {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    font-weight: 600;
+    color: #000;
+}
+
+.date {
+    font-size: 12px;
+    color: #888;
+}
+
+/* emoji + rating */
+.rightMeta {
+    margin-left: auto;
+    text-align: right;
+}
+
+.emoji {
+    font-size: 18px;
+}
+
+/* FIX 5: badge moved, no overlap */
+.scrapedBadge {
+    position: absolute;
+    top: -8px;
+    left: 120px;
+    font-size: 10px;
+    background: #6bcece88;
+    padding: 0px 6px;
+    border-radius: 18px;
+}
+
+/* TEXT (FIX 3) */
+.text {
+    margin-top: 10px;
+    color: #000;
+    font-size: 15px;
+    /* +2px */
+    line-height: 1.4;
+}
+
+/* TAGS */
+.tagsWrapper {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    /* FIX 4 */
+}
+
+.tagsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tagsRow.tighter {
+    gap: 4px;
+    /* FIX 4 */
+}
+
+.tag {
+    padding: 1px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tag.positive {
+    background: #35c800;
+    color: #000000;
+    font-weight: 600;
+}
+
+.tag.negative {
+    background: #ed6a0d;
+    color: #000000;
+    font-weight: 600;
+}
+
+/* DIVIDER */
+.divider {
+    height: 1px;
+    background: #ddd;
+    margin: 14px 0;
+}
+
+/* FAB */
+.fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #333;
+    color: #fff;
+    font-size: 32px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sortWrapper {
+    position: relative;
+}
+
+.sortBtn {
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* dropdown */
+.sortDropdown {
+    position: absolute;
+    right: 0;
+    top: 28px;
+
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+
+    width: 140px;
+    padding: 6px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    z-index: 10;
+}
+
+.sortDropdown div {
+    font-size: 13px;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.sortDropdown div:hover {
+    background: #f2f2f2;
+}
+
+.reviewCard:hover {
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.fab:hover {
+    background: #555;
+    color: #fff;
+    cursor: pointer;
+}
+
+.backBtn:hover {
+    color: #555;
+    cursor: pointer;
+}
+
+.sortBtn:hover {
+    color: #000;
+    cursor: pointer;
+}
