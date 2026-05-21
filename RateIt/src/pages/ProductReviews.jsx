@@ -1,62 +1,127 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ProductReviews.css";
-import { useNavigate } from "react-router-dom";
-import { MoveLeft, Plus, ArrowDownNarrowWide, Smile, Frown } from "lucide-react";
-
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  MoveLeft,
+  Plus,
+  ArrowDownNarrowWide,
+  Smile,
+  Frown
+} from "lucide-react";
+import { API_URL } from "../config";
 
 export default function ProductReviews() {
   const navigate = useNavigate();
+  const { id } = useParams();
+
   const [sort, setSort] = useState("new_desc");
   const [openSort, setOpenSort] = useState(false);
 
-  const product = {
-    name: "CMF Phone 2 Pro by Nothing",
-    rating: 4.4,
-    trend: "up",
-    pros: ["Дизайн", "Автономність", "Якість"],
-    cons: ["Динамік", "Мікрофон"],
+  const [reviews, setReviews] = useState([]);
+  const [product, setProduct] = useState(null);
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("uk-UA");
   };
 
-  const reviews = [
-    {
-      id: 1,
-      user: "Ivan",
-      date: "5 mon ago",
-      rating: 4.5,
-      sentiment: "positive",
-      text: "Гарний телефон, але звук слабкий і інколи просідає батарея.",
-      pros: ["екран", "дизайн"],
-      cons: ["звук"],
-      scraped: false,
-    },
-    {
-      id: 2,
-      user: "Oleh",
-      date: "1 year ago",
-      rating: 4.2,
-      sentiment: "negative",
-      text: "Очікував кращу камеру.",
-      pros: ["ціна"],
-      cons: ["камера"],
-      scraped: true,
-    },
-  ];
+  // 🔥 LOAD DATA
+  useEffect(() => {
+    refreshReviews();
+  }, [id]);
+
+  // 🔥 REFRESH
+  const refreshReviews = async () => {
+    const res = await fetch(
+      `${API_URL}/reviews?productId=${id}`
+    );
+
+    const data = await res.json();
+
+    setReviews(data);
+
+    const prod = await fetch(
+      `${API_URL}/products/${id}`
+    );
+
+    const prodData = await prod.json();
+
+    setProduct(prodData);
+  };
+
+  // 🔥 SORTING
+  const allPros = reviews.flatMap(r => r.pros || []);
+  const allCons = reviews.flatMap(r => r.cons || []);
+
+  const topTags = (arr, limit = 4) => {
+    const count = {};
+
+    arr.forEach(t => {
+      count[t] = (count[t] || 0) + 1;
+    });
+
+    return Object.entries(count)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limit)
+      .map(([tag]) => tag);
+  };
+
+  const topPros = topTags(allPros);
+  const topCons = topTags(allCons);
+
+  const sortedReviews = [...reviews].sort((a, b) => {
+
+    if (sort === "likes_desc") return b.upvotes - a.upvotes;
+    if (sort === "likes_asc") return a.upvotes - b.upvotes;
+    if (sort === "new_asc") return a.id - b.id;
+
+    return b.id - a.id;
+  });
 
   const setSortMode = (mode) => {
     setSort(mode);
     setOpenSort(false);
   };
 
+  // 👍 LIKE
+  const likeReview = async (reviewId) => {
+    await fetch(
+      `${API_URL}/reviews/${reviewId}/like`,
+      {
+        method: "POST"
+      }
+    );
+
+    refreshReviews();
+  };
+
+  // 👎 DISLIKE
+  const dislikeReview = async (reviewId) => {
+    await fetch(
+      `${API_URL}/reviews/${reviewId}/dislike`,
+      {
+        method: "POST"
+      }
+    );
+
+    refreshReviews();
+  };
+
+  if (!product) return <div>Loading...</div>;
+
   return (
     <div className="productPage">
 
       {/* TOP */}
       <div className="topBar">
-        <div className="backBtn" onClick={() => navigate(-1)}>
+
+        <div
+          className="backBtn"
+          onClick={() => navigate(-1)}
+        >
           <MoveLeft size={28} />
         </div>
 
         <div className="sortWrapper">
+
           <div
             className="sortBtn"
             onClick={() => setOpenSort(!openSort)}
@@ -66,51 +131,82 @@ export default function ProductReviews() {
 
           {openSort && (
             <div className="sortDropdown">
+
               <div onClick={() => setSortMode("new_desc")}>
                 New ↓
               </div>
+
               <div onClick={() => setSortMode("new_asc")}>
                 New ↑
               </div>
+
               <div onClick={() => setSortMode("likes_desc")}>
                 Likes ↓
               </div>
+
               <div onClick={() => setSortMode("likes_asc")}>
                 Likes ↑
               </div>
+
             </div>
           )}
+
         </div>
+
       </div>
 
       {/* PRODUCT */}
       <div className="productCard">
+
         <div className="productTop">
-          <div className="productName">{product.name}</div>
+
+          <div className="productName">
+            {product.name}
+          </div>
 
           <div className="rightBlock">
-            <div className={`trend ${product.trend}`}>↑</div>
+
+            <div className={`trend ${product.trend}`}>
+              {product.trend === "up" ? "↑" : "↓"}
+            </div>
 
             <div className="ratingBlock">
               <span className="star">★</span>
-              <span className="ratingValueBlack">{product.rating}</span>
+
+              <span className="ratingValueBlack">
+                {product.rating}
+              </span>
             </div>
+
           </div>
+
         </div>
 
         <div className="tagsWrapper">
-          <div className="tagsRow">
-            {product.pros.map((p, i) => (
-              <span key={i} className="tag positive">{p}</span>
-            ))}
-          </div>
 
-          <div className="tagsRow tighter">
-            {product.cons.map((c, i) => (
-              <span key={i} className="tag negative">{c}</span>
-            ))}
-          </div>
+          {topPros.length > 0 && (
+            <div className="tagsRow">
+              {topPros.map((t, i) => (
+                <span key={i} className="tag positive">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {topCons.length > 0 && (
+            <div className="tagsRow">
+              {topCons.map((t, i) => (
+                <span key={i} className="tag negative">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+
         </div>
+
+
       </div>
 
       <div className="divider" />
@@ -118,8 +214,12 @@ export default function ProductReviews() {
       {/* REVIEWS */}
       <div className="reviewsList">
 
-        {reviews.map((r) => (
-          <div key={r.id} className="reviewCard" onClick={() => navigate("/review")}>
+        {sortedReviews.map((r) => (
+          <div
+            key={r.id}
+            className="reviewCard"
+            onClick={() => navigate(`/review/${r.id}`)}
+          >
 
             <div className="reviewHeader">
 
@@ -127,53 +227,90 @@ export default function ProductReviews() {
 
               <div className="metaBlock">
                 <div className="userName">{r.user}</div>
-                <div className="date">{r.date}</div>
+                <div className="date">{formatDate(r.date)}</div>
               </div>
 
               <div className="rightMeta">
+
                 <div className="emoji">
-                  {r.sentiment === "positive" ?
-                    <Smile size={32} color="#1a7f37" />
-                    :
-                    <Frown size={32} color="#b54708" />}
+                  {r.sentiment === "positive"
+                    ? <Smile size={32} color="#1a7f37" />
+                    : <Frown size={32} color="#b54708" />
+                  }
                 </div>
 
                 <div className="ratingBlock">
                   <span className="star">★</span>
-                  <span className="ratingValueBlack">{r.rating}</span>
-                </div>
-              </div>
 
-              {r.scraped && (
-                <div className="scrapedBadge">
-                  web-scraped
+                  <span className="ratingValueBlack">
+                    {r.rating}
+                  </span>
                 </div>
-              )}
+
+              </div>
 
             </div>
 
-            <div className="text">{r.text}</div>
+            {/* 🔥 LIKE / DISLIKE */}
+            <div
+              className="actionsRow"
+              onClick={(e) => e.stopPropagation()}
+            >
 
-            <div className="tagsWrapper">
-              <div className="tagsRow">
-                {r.pros.map((p, i) => (
-                  <span key={i} className="tag positive">{p}</span>
-                ))}
-              </div>
+              <button onClick={() => likeReview(r.id)}>
+                👍 {r.upvotes}
+              </button>
 
-              <div className="tagsRow tighter">
-                {r.cons.map((c, i) => (
-                  <span key={i} className="tag negative">{c}</span>
-                ))}
-              </div>
+              <button onClick={() => dislikeReview(r.id)}>
+                👎 {r.downvotes}
+              </button>
+
             </div>
+
+            <div className="text">
+              {r.text}
+            </div>
+
+            {(r.pros?.length || r.cons?.length) && (
+              <div className="tagsWrapper">
+
+                {r.pros?.length > 0 && (
+                  <div className="tagsRow">
+
+                    {r.pros.map((p, i) => (
+                      <span key={i} className="tag positive">
+                        {p}
+                      </span>
+                    ))}
+
+                  </div>
+                )}
+
+                {r.cons?.length > 0 && (
+                  <div className="tagsRow">
+
+                    {r.cons.map((c, i) => (
+                      <span key={i} className="tag negative">
+                        {c}
+                      </span>
+                    ))}
+
+                  </div>
+                )}
+
+              </div>
+            )}
 
           </div>
         ))}
 
       </div>
 
-      <div className="fab" onClick={() => navigate("/create")}>
+      {/* FAB */}
+      <div
+        className="fab"
+        onClick={() => navigate(`/product/${id}/create`)}
+      >
         <Plus size={30} />
       </div>
 

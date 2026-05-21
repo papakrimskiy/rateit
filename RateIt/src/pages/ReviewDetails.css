@@ -88,6 +88,8 @@
     color: #2563eb;
     font-size: 14px;
     cursor: pointer;
+    display: block;
+    text-align: left;
 }
 
 /* TEXT */
@@ -131,7 +133,6 @@
 }
 
 .tag {
-    padding: -2px;
     border-radius: 999px;
     font-size: 12px;
     font-weight: 700;
@@ -158,8 +159,10 @@
     background: #eee;
     padding: 8px 12px;
     border-radius: 10px;
+
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 6px;
 }
 
 .commentBox {
@@ -170,9 +173,9 @@
 
 /* DIVIDER */
 .divider {
-    height: 1px;
-    background: #ddd;
-    margin: 16px 0;
+    height: 2px;
+    background: #999;
+    margin: 18px 0;
 }
 
 /* COMMENTS */
@@ -214,4 +217,39 @@
 
 .backBtn:hover{
     color: #000000;
+}
+
+.voteBox span,
+.commentBox span,
+.commentActions span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.addComment {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.commentInput {
+    width: 100%;
+    min-height: 90px;
+    border-radius: 14px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    resize: none;
+    font-size: 15px;
+}
+
+.commentBtn {
+    align-self: flex-end;
+    border: none;
+    background: black;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 12px;
+    cursor: pointer;
 }

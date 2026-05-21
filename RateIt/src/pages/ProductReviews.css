@@ -18,12 +18,19 @@
 }
 
 /* CARDS */
-.productCard,
+.productPage .productCard {
+    background: #f0f0f0;
+    border: 2px solid #d8d8d8;
+    border-radius: 5px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
 .reviewCard {
     background: #fff;
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 14px;
-    margin-top: 12px;
+    border: 1px solid #e8e8e8;
 }
 
 /* PRODUCT */
@@ -33,10 +40,11 @@
     align-items: flex-start;
 }
 
-.productName {
+.productPage .productName {
     font-weight: 600;
     color: #000;
     max-width: 70%;
+    font-size: 22px;
 }
 
 /* RIGHT SIDE */
@@ -179,12 +187,6 @@
     font-weight: 600;
 }
 
-/* DIVIDER */
-.divider {
-    height: 1px;
-    background: #ddd;
-    margin: 14px 0;
-}
 
 /* FAB */
 .fab {
