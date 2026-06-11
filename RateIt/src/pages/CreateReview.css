@@ -67,3 +67,55 @@ textarea::placeholder {
 .attach:hover {
     color: #000;
 }
+
+.starsPicker {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.starWrapper {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+}
+
+.star {
+    color: #d0d5dd;
+    fill: transparent;
+    transition: 0.15s;
+}
+
+.star.filled {
+    color: #f5b301;
+    fill: #f5b301;
+}
+
+.star.halfFilled {
+    color: #f5b301;
+    fill: #f5b30188;
+}
+
+.half {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 2;
+}
+
+.half.left {
+    left: 0;
+}
+
+.half.right {
+    right: 0;
+}
+
+.ratingText {
+    margin-left: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}

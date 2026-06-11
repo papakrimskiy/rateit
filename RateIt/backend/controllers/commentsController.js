@@ -23,7 +23,7 @@ exports.getComments = (req, res) => {
 
 // CREATE comment
 exports.createComment = (req, res) => {
-  const { reviewId, user, text } = req.body;
+  const { reviewId, user, text, parentId } = req.body;
 
   const date = new Date().toISOString();
 
@@ -36,19 +36,63 @@ exports.createComment = (req, res) => {
       text,
       up,
       down,
-      replies
+      replies,
+      parentId
     )
-    VALUES (?, ?, ?, ?, 0, 0, 0)
+    VALUES (?, ?, ?, ?, 0, 0, 0, ?)
     `,
-    [reviewId, user, date, text],
+    [reviewId, user, date, text, parentId || null],
     function (err) {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
 
-      res.status(201).json({
-        id: this.lastID
-      });
+      db.run(
+        `
+        UPDATE reviews
+        SET commentsCount = commentsCount + 1
+        WHERE id = ?
+        `,
+        [reviewId],
+        (err) => {
+
+          if (err) {
+            return res.status(500).json({
+              error: err.message
+            });
+          }
+
+          res.status(201).json({
+            id: this.lastID
+          });
+          
+        });
+    }
+  );
+};
+
+exports.likeComment = (req, res) => {
+  const { id } = req.params;
+
+  db.run(
+    "UPDATE comments SET up = up + 1 WHERE id = ?",
+    [id],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ ok: true });
+    }
+  );
+};
+
+exports.dislikeComment = (req, res) => {
+  const { id } = req.params;
+
+  db.run(
+    "UPDATE comments SET down = down + 1 WHERE id = ?",
+    [id],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ ok: true });
     }
   );
 };

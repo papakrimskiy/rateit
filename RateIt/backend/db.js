@@ -17,6 +17,7 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS reviews (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       productId INTEGER,
+      productName TEXT,
       user TEXT,
       date TEXT,
       rating REAL,
@@ -29,7 +30,8 @@ db.serialize(() => {
       cons TEXT,
       upvotes INTEGER,
       downvotes INTEGER,
-      commentsCount INTEGER
+      commentsCount INTEGER,
+      source TEXT
     )
   `);
 
@@ -42,7 +44,8 @@ db.serialize(() => {
       text TEXT,
       up INTEGER,
       down INTEGER,
-      replies INTEGER
+      replies INTEGER,
+      parentId INTEGER
     )
   `);
 
@@ -59,58 +62,67 @@ db.serialize(() => {
   });
 
   // REVIEWS SEED
-  db.get("SELECT COUNT(*) as count FROM reviews", (err, row) => {
-    if (row.count === 0) {
-      db.run(`
-        INSERT INTO reviews (
-          productId,
-          user,
-          date,
-          rating,
-          sentiment,
-          title,
-          link,
-          text,
-          summary,
-          pros,
-          cons,
-          upvotes,
-          downvotes,
-          commentsCount
-        )
-        VALUES
-        (
-          1,
-          'Ivan',
-          datetime('now'),
-          4.5,
-          'positive',
-          'Хороший телефон',
-          '',
-          'Гарний телефон...',
-          '',
-          '[]',
-          '[]',
-          3,
-          1,
-          2
-        ),
-        (
-          2,
-          'Anna',
-          datetime('now'),
-          4.7,
-          'positive',
-          'Смачна піца',
-          '',
-          'Дуже смачно',
-          5,
-          0,
-          1
-        )
-      `);
-    }
-  });
+  // db.get("SELECT COUNT(*) as count FROM reviews", (err, row) => {
+  //   if (row.count === 0) {
+  //     db.run(`
+  //       INSERT INTO reviews (
+  //         productId,
+  //         productName,
+  //         user,
+  //         date,
+  //         rating,
+  //         sentiment,
+  //         title,
+  //         link,
+  //         text,
+  //         summary,
+  //         pros,
+  //         cons,
+  //         upvotes,
+  //         downvotes,
+  //         commentsCount,
+  //         source
+  //       )
+  //       VALUES
+  //       (
+  //         1,
+  //         'CMF Phone 2 Pro by Nothing',
+  //         'Ivan',
+  //         datetime('now'),
+  //         4.5,
+  //         'positive',
+  //         'Хороший телефон',
+  //         '',
+  //         'Гарний телефон...',
+  //         '',
+  //         '[]',
+  //         '[]',
+  //         3,
+  //         1,
+  //         2,
+  //         null
+  //       ),
+  //       (
+  //         2,
+  //         'Піцерія Pizza Day',
+  //         'Anna',
+  //         datetime('now'),
+  //         4.7,
+  //         'positive',
+  //         'Смачна піца',
+  //         '',
+  //         'Дуже смачно',
+  //         '',
+  //         '[]',
+  //         '[]',
+  //         5,
+  //         0,
+  //         1,
+  //         null
+  //       )
+  //     `);
+  //   }
+  // });
 
   // COMMENTS SEED
   db.get("SELECT COUNT(*) as count FROM comments", (err, row) => {
@@ -123,7 +135,8 @@ db.serialize(() => {
           text,
           up,
           down,
-          replies
+          replies,
+          parentId
         )
         VALUES
         (
@@ -133,7 +146,8 @@ db.serialize(() => {
           'Погоджуюсь',
           3,
           0,
-          1
+          1,
+          null
         ),
         (
           1,
@@ -142,7 +156,8 @@ db.serialize(() => {
           'Не згоден',
           1,
           2,
-          0
+          0,
+          null
         )
       `);
     }

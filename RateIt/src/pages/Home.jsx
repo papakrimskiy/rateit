@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Home.css";
 import { useNavigate } from "react-router-dom";
-import { Search, CircleUserRound } from "lucide-react";
+import { Search, CircleUserRound, Plus } from "lucide-react";
 import { API_URL } from "../config";
 
 export default function Home() {
@@ -10,9 +10,54 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${API_URL}/products`)
-      .then(res => res.json())
-      .then(data => setProducts(data));
+    load();
+  }, []);
+
+  const load = async () => {
+    const res = await fetch(`${API_URL}/reviews`);
+    const data = await res.json();
+
+    const grouped = {};
+
+    data.forEach(r => {
+      if (!grouped[r.productId]) {
+        grouped[r.productId] = {
+          id: r.productId,
+          name: r.productName,
+          ratingSum: 0,
+          ratingCount: 0,
+          count: 0,
+          trend: "up",
+          reviews: []
+        };
+      }
+
+      if (r.source !== "web-scraped" && r.rating != null) {
+        grouped[r.productId].ratingSum += r.rating;
+        grouped[r.productId].ratingCount += 1;
+      }
+      
+      grouped[r.productId].count += 1;
+      grouped[r.productId].reviews.push(r);
+    });
+
+    const result = Object.values(grouped).map(p => ({
+      ...p,
+      rating:
+        p.ratingCount > 0
+          ? (p.ratingSum / p.ratingCount).toFixed(1)
+          : null
+    }));
+
+    setProducts(result);
+  };
+
+  useEffect(() => {
+    const handler = () => load();
+
+    window.addEventListener("focus", handler);
+
+    return () => window.removeEventListener("focus", handler);
   }, []);
 
   const filtered = products.filter(p =>
@@ -34,7 +79,6 @@ export default function Home() {
       </div>
 
       <div className="searchBox">
-
         <span className="searchIcon">
           <Search size={20} />
         </span>
@@ -66,7 +110,6 @@ export default function Home() {
                 className="productCard"
                 onClick={() => navigate(`/product/${p.id}`)}
               >
-
                 <div className="productTop">
 
                   <div className="productName">
@@ -75,16 +118,20 @@ export default function Home() {
 
                   <div className="rightBlock">
 
-                    <div className={`trend ${p.trend}`}>
-                      {p.trend === "up" ? "↑" : "↓"}
-                    </div>
+                    {p.rating != null && (
+                      <div className="ratingBlock">
+                        <span className="star">★</span>
+                        <span className="ratingValueBlack">
+                          {p.rating}
+                        </span>
+                      </div>
+                    )}
 
-                    <div className="rating">
-                      ★ {p.rating}
+                    <div className="count">
+                      {p.count} відгуків
                     </div>
 
                   </div>
-
                 </div>
 
               </div>
@@ -105,7 +152,6 @@ export default function Home() {
                   className="productCard"
                   onClick={() => navigate(`/product/${p.id}`)}
                 >
-
                   <div className="productTop">
 
                     <div className="productName">
@@ -114,18 +160,22 @@ export default function Home() {
 
                     <div className="rightBlock">
 
-                      <div className={`trend ${p.trend}`}>
-                        {p.trend === "up" ? "↑" : "↓"}
-                      </div>
+                      {p.rating != null && (
+                        <div className="ratingBlock">
+                          <span className="star">★</span>
+                          <span className="ratingValueBlack">
+                            {p.rating}
+                          </span>
+                        </div>
+                      )}
 
-                      <div className="rating">
-                        ★ {p.rating}
+                      <div className="count">
+                        {p.count} відгуків
                       </div>
 
                     </div>
 
                   </div>
-
                 </div>
               ))
             ) : (
@@ -137,6 +187,14 @@ export default function Home() {
         )}
 
       </div>
+
+      {/* FAB */}
+        <div
+          className="fab"
+          onClick={() => navigate("/create-review")}
+        >
+          <Plus size={30} />
+        </div>
 
     </div>
   );

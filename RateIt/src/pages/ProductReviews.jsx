@@ -5,7 +5,10 @@ import {
   MoveLeft,
   Plus,
   ArrowDownNarrowWide,
+  ArrowBigUp,
+  ArrowBigDown,
   Smile,
+  Meh,
   Frown
 } from "lucide-react";
 import { API_URL } from "../config";
@@ -105,6 +108,25 @@ export default function ProductReviews() {
     refreshReviews();
   };
 
+  const importReddit = async () => {
+
+    await fetch(
+      `${API_URL}/reviews/import-reddit`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          productId: Number(id),
+          query: product.name
+        })
+      }
+    );
+
+    refreshReviews();
+  };
+
   if (!product) return <div>Loading...</div>;
 
   return (
@@ -115,10 +137,16 @@ export default function ProductReviews() {
 
         <div
           className="backBtn"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/home`)}
         >
           <MoveLeft size={28} />
         </div>
+
+        <button
+          onClick={importReddit}
+        >
+          Import Reddit
+        </button>
 
         <div className="sortWrapper">
 
@@ -170,13 +198,14 @@ export default function ProductReviews() {
               {product.trend === "up" ? "↑" : "↓"}
             </div>
 
-            <div className="ratingBlock">
+            {product.rating != null && (<div className="ratingBlock">
               <span className="star">★</span>
 
               <span className="ratingValueBlack">
                 {product.rating}
               </span>
             </div>
+            )}
 
           </div>
 
@@ -230,22 +259,34 @@ export default function ProductReviews() {
                 <div className="date">{formatDate(r.date)}</div>
               </div>
 
+              {r.source === "web-scraped" && (
+                <div className="scrapedBadge">
+                  web-scraped
+                </div>
+              )}
+
               <div className="rightMeta">
 
                 <div className="emoji">
-                  {r.sentiment === "positive"
-                    ? <Smile size={32} color="#1a7f37" />
-                    : <Frown size={32} color="#b54708" />
-                  }
+
+                  {r.sentiment === "positive" ? (
+                    <Smile size={32} color="#1a7f37" />
+                  ) : r.sentiment === "neutral" ? (
+                    <Meh size={32} color="#45577e" />
+                  ) : (
+                    <Frown size={32} color="#b54708" />
+                  )}
+
                 </div>
 
-                <div className="ratingBlock">
-                  <span className="star">★</span>
+                {r.rating != null && (<div className="ratingBlock">
+                    <span className="star">★</span>
 
-                  <span className="ratingValueBlack">
-                    {r.rating}
-                  </span>
-                </div>
+                    <span className="ratingValueBlack">
+                      {r.rating}
+                    </span>
+                  </div>
+                )}
 
               </div>
 
@@ -258,12 +299,14 @@ export default function ProductReviews() {
             >
 
               <button onClick={() => likeReview(r.id)}>
-                👍 {r.upvotes}
+                <ArrowBigUp size={20} /> {r.upvotes}
               </button>
 
-              <button onClick={() => dislikeReview(r.id)}>
-                👎 {r.downvotes}
-              </button>
+              {r.downvotes != null && (
+                <button onClick={() => dislikeReview(r.id)}>
+                  <ArrowBigDown size={20} /> {r.downvotes}
+                </button>
+              )}
 
             </div>
 
@@ -271,7 +314,7 @@ export default function ProductReviews() {
               {r.text}
             </div>
 
-            {(r.pros?.length || r.cons?.length) && (
+            {(r.pros?.length > 0 || r.cons?.length > 0) && (
               <div className="tagsWrapper">
 
                 {r.pros?.length > 0 && (
@@ -309,7 +352,12 @@ export default function ProductReviews() {
       {/* FAB */}
       <div
         className="fab"
-        onClick={() => navigate(`/product/${id}/create`)}
+        onClick={() =>
+          navigate(`/product/${id}/create`, {
+            state: {
+              productName: product?.name || ""
+            }
+          })}
       >
         <Plus size={30} />
       </div>

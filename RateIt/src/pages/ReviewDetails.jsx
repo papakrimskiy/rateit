@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   MoveLeft,
   Smile,
+  Meh,
   Frown,
   ArrowBigUp,
   ArrowBigDown,
@@ -18,6 +19,7 @@ export default function ReviewDetails() {
   const [review, setReview] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [replyTo, setReplyTo] = useState(null);
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("uk-UA");
   };
@@ -26,6 +28,32 @@ export default function ReviewDetails() {
   useEffect(() => {
     refreshData();
   }, [id]);
+
+  const buildTree = (comments) => {
+    const map = {};
+    const roots = [];
+
+    comments.forEach(c => {
+      map[c.id] = {
+        ...c,
+        children: []
+      };
+    });
+
+    comments.forEach(c => {
+
+      if (c.parentId) {
+        map[c.parentId]?.children.push(map[c.id]);
+      } else {
+        roots.push(map[c.id]);
+      }
+
+    });
+
+    return roots;
+  };
+
+  const treeComments = buildTree(comments);
 
   // 🔥 REFRESH
   const refreshData = async () => {
@@ -91,18 +119,109 @@ export default function ReviewDetails() {
         body: JSON.stringify({
           reviewId: Number(id),
           user: "Ivan",
-          text: newComment
+          text: newComment,
+          parentId: replyTo?.id
         })
       }
     );
 
     setNewComment("");
-
     refreshData();
+    setReplyTo(null);
   };
 
   if (!review) return <div>Loading...</div>;
   // console.log("REVIEW:", review);
+
+  const renderComment = (c, level = 0) => (
+
+    <div
+      key={c.id}
+      className="comment"
+      style={{
+        marginLeft: level * 20
+      }}
+    >
+
+      <div className="commentHeader">
+
+        <div className="avatar small" />
+
+        <div className="meta">
+
+          <div className="user">
+            {c.user}
+          </div>
+
+          <div className="date">
+            {formatDate(c.date)}
+          </div>
+
+        </div>
+
+      </div>
+
+      <div className="commentText">
+        {c.text}
+      </div>
+
+      <div className="commentActions">
+
+        <button
+          type="button"
+          onClick={() => likeComment(c.id)}
+        >
+          <ArrowBigUp size={18} /> {c.up}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => dislikeComment(c.id)}
+        >
+          <ArrowBigDown size={18} /> {c.down}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setReplyTo(c)}
+        >
+          <MessageCircle size={18} /> Reply
+        </button>
+
+      </div>
+
+      {c.children?.map(child =>
+        renderComment(child, level + 1)
+      )}
+
+    </div>
+  );
+
+  const likeComment = async (id) => {
+
+    await fetch(
+      `${API_URL}/comments/${id}/like`,
+      {
+        method: "POST"
+      }
+    );
+
+    await refreshData();
+  };
+
+  const dislikeComment = async (id) => {
+
+    await fetch(
+      `${API_URL}/comments/${id}/dislike`,
+      {
+        method: "POST"
+      }
+    );
+
+    await refreshData();
+  };
+
+
 
   return (
     <div className="reviewPage">
@@ -130,15 +249,16 @@ export default function ReviewDetails() {
           </div>
         </div>
 
-        <div className="ratingBlock">
+        {review.rating != null && (<div className="ratingBlock">
           <span className="star">★</span>
 
           <span className="rating">
             {review.rating}
           </span>
         </div>
-
-      </div>
+        )} 
+        
+      </div>      
 
       {/* TITLE */}
       <div className="titleRow">
@@ -148,10 +268,15 @@ export default function ReviewDetails() {
         </div>
 
         <div className="emoji">
-          {review.sentiment === "positive"
-            ? <Smile size={32} color="#1a7f37" />
-            : <Frown size={32} color="#b54708" />
-          }
+
+          {review.sentiment === "positive" ? (
+            <Smile size={32} color="#1a7f37" />
+          ) : review.sentiment === "neutral" ? (
+            <Meh size={32} color="#45577e" />
+          ) : (
+            <Frown size={32} color="#b54708" />
+          )}
+
         </div>
 
       </div>
@@ -205,9 +330,11 @@ export default function ReviewDetails() {
             <ArrowBigUp /> {review.upvotes}
           </button>
 
-          <button onClick={dislikeReview}>
+          {review.downvotes != null && (<button onClick={dislikeReview}>
             <ArrowBigDown /> {review.downvotes}
-          </button>
+          </button>         
+                
+          )}
 
         </div>
 
@@ -229,6 +356,16 @@ export default function ReviewDetails() {
           onChange={(e) => setNewComment(e.target.value)}
         />
 
+        {replyTo && (
+          <div className="replyInfo">
+            Відповідь до {replyTo.user}
+
+            <button onClick={() => setReplyTo(null)}>
+              скасувати
+            </button>
+          </div>
+        )}
+
         <button
           className="commentBtn"
           onClick={addComment}
@@ -241,49 +378,7 @@ export default function ReviewDetails() {
       {/* COMMENTS */}
       <div className="comments">
 
-        {comments.map((c) => (
-          <div key={c.id} className="comment">
-
-            <div className="commentHeader">
-
-              <div className="avatar small" />
-
-              <div className="meta">
-
-                <div className="user">
-                  {c.user}
-                </div>
-
-                <div className="date">
-                  {formatDate(c.date)}
-                </div>
-
-              </div>
-
-            </div>
-
-            <div className="commentText">
-              {c.text}
-            </div>
-
-            <div className="commentActions">
-
-              <span>
-                <ArrowBigUp /> {c.up}
-              </span>
-
-              <span>
-                <ArrowBigDown /> {c.down}
-              </span>
-
-              <span>
-                <MessageCircle /> {c.replies}
-              </span>
-
-            </div>
-
-          </div>
-        ))}
+        {treeComments.map(c => renderComment(c))}
 
       </div>
 

@@ -6,7 +6,8 @@ const {
   getReviewById,
   createReview,
   likeReview,
-  dislikeReview
+  dislikeReview,
+  importRedditReviews
 } = require("../controllers/reviewsController");
 
 router.get("/", getReviews);
@@ -15,4 +16,5 @@ router.post("/", createReview);
 router.post("/:id/like", likeReview);
 router.post("/:id/dislike", dislikeReview);
 
+router.post("/import-reddit", importRedditReviews);
 module.exports = router;

@@ -3,43 +3,52 @@ const axios = require("axios");
 exports.analyzeReview = async (text, rating) => {
   try {
     const response = await axios.post("http://localhost:11434/api/generate", {
-      model: "llama3",
+      model: "qwen2.5:7b",
       prompt: `
-        Ти аналізуєш відгуки українською мовою.
+        Проаналізуй відгук.
 
-        Поверни ТІЛЬКИ valid JSON.
-        Без пояснень.
+        Відповідай ТІЛЬКИ валідним JSON.
         Без markdown.
-        Без тексту до або після JSON.
+        Без пояснень.
 
         Правила:
-        - sentiment: positive / negative
-        - summary: короткий підсумок українською (1-2 речення)
-        - pros: короткі позитивні теги українською
-        - cons: короткі негативні теги українською
-        - pros/cons НЕ повинні бути реченнями
-        - pros/cons = лише короткі теги або категорії
-        - НЕ описуй проблему реченням
-        - правильний приклад cons: ["Очікування"]
-        - неправильний приклад cons: ["Очікування інколи буває довгим"]
-        - приклади хороших тегів:
-          ["Смак", "Ціна", "Екран", "Камера", "Автономність"]
-        - приклади поганих тегів:
-          ["Піцца дуже смачна"]
-          ["Waiting time can be long"]
+        - summary = короткий висновок українською
+        - pros = 1-4 коротких тегів
+        - cons = 1-4 коротких тегів
+        - теги повинні бути ІМЕННИКАМИ
+        - теги мають відповідати тексту
+        - всі pros і cons повинні бути українською мовою навіть якщо мова відгуку англійська
+        - використовуй короткі іменники або словосполучення українською
+        - заборонено використовувати англійські слова (окрім назв брендів)
+        - кожен тег максимум 1–2 слова
+        - теги мають бути узагальненими (наприклад: "дизайн", "батарея", "ціна")
+        - не вигадуй інформацію
+        - якщо мінусів немає → cons: []
+        - якщо плюсів немає → pros: []
+        - якщо відгук пустий то став positive sentiment, якщо оцінка 4 або 5 і negative якщо оцінка 1, 2 або 3
+        - якщо відгук пустий то summary, pros та cons повинні бути пустими
+        - якщо відгук не пустий то summary ОБОВ'ЯЗКОВИЙ
+        - summary = 1 коротке речення українською
+        - summary повинен описувати загальне враження автора
+        - summary максимум 15 слів
 
         Формат:
         {
-          "sentiment": "positive",
+          "sentiment": "positive|neutral|negative",
           "summary": "",
           "pros": [],
           "cons": []
         }
 
-        Текст: ${text}
-        Оцінка: ${rating}
+        Якщо відгук не пустий, а summary пустий — відповідь НЕВАЛІДНА.
+
+        Текст:
+        ${text}
       `,
-      stream: false
+      stream: false,
+      options: {
+        temperature: 0.2
+      }
     });
 
     let output = response.data.response;
@@ -55,7 +64,8 @@ exports.analyzeReview = async (text, rating) => {
     return json;
 
   } catch (err) {
-    console.log("Ollama error:", err.message);
+    console.log("OLLAMA FULL ERROR:");
+    console.dir(err, { depth: null });
 
     return {
       sentiment: "neutral",
